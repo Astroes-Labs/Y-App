@@ -9,35 +9,48 @@ class IdeaController extends Controller
 {
     public function show(Idea $idea)
     {
+
         return view('ideas.show',[
-            'idea' => $idea
-            
+            'idea' => $idea,
         ]);
     }
     public function edit(Idea $idea)
     {
+        if(auth()->id() !== $idea->user_id){
+            abort(404);
+        }
         $editing = true;
         return view('ideas.show',compact('idea', 'editing'));
     }
     public function update(Idea $idea)
     {
-        request()->validate([
+        if(auth()->id() !== $idea->user_id){
+            abort(404);
+        }
+       /*  request()->validate([
             'content' => 'required|min:3|max:240'
         ]);
         $idea->content = request()->get('content', '');
-        $idea->save();
+        $idea->save(); */
+
+        //OR
+        $validated = request()->validate([
+            'content' => 'required|min:3|max:240'
+        ]);
+
+        $idea->update($validated);
 
         return redirect()->route('ideas.show',$idea->id)->with('success',"Idea updated successfully!");
     }
     public function store()
     {
         //dump();
-        request()->validate([
+        $validated = request()->validate([
             'content' => 'required|min:3|max:240'
         ]);
-        $idea = Idea::create([
-            'content' => request()->get('content', ''),
-        ]);
+
+        $validated['user_id'] =  auth()->id();
+        Idea::create($validated);
 
         return redirect()->route('dashboard')->with('success', 'Idea Created Successfully!');
     }
@@ -53,6 +66,9 @@ class IdeaController extends Controller
     //Route Model Binding
     public function destroy(Idea $idea)
     {
+        if(auth()->id() !== $idea->user_id){
+            abort(404);
+        }
         $idea->delete();
         return redirect()->route('dashboard')->with('success', 'Idea Deleted Successfully!');
     }

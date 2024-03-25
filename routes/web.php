@@ -1,22 +1,38 @@
 <?php
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IdeaController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+/* 
+Route::group(['prefix' => 'ideas/', 'as' => 'ideas.', 'middleware' => ['auth']], function () {
 
-Route::post('/ideas', [IdeaController::class, 'store'])->name('ideas.store');
 
-Route::get('/ideas/{idea}', [IdeaController::class, 'show'])->name('ideas.show');
+    Route::get('/{idea}', [IdeaController::class, 'show'])->name('show');
 
-Route::get('/ideas/{idea}/edit', [IdeaController::class, 'edit'])->name('ideas.edit');
+    Route::group(['middleware' => ['auth']], function () {
+        Route::post('', [IdeaController::class, 'store'])->name('store');
 
-Route::put('/ideas/{idea}', [IdeaController::class, 'update'])->name('ideas.update');
+        Route::get('/{idea}/edit', [IdeaController::class, 'edit'])->name('edit');
 
-Route::delete('/ideas/{idea}', [IdeaController::class, 'destroy'])->name('ideas.destroy');
+        Route::put('/{idea}', [IdeaController::class, 'update'])->name('update');
 
-Route::get('/terms',function(){
+        Route::delete('/{idea}', [IdeaController::class, 'destroy'])->name('destroy');
+
+        Route::post('/{idea}/comments', [CommentController::class, 'store'])->name('comments.store');
+
+    });
+}); */
+//Route using resources function is the same as the above commented routing group
+
+Route::resource('ideas', IdeaController::class)->except(['index','create','show'])->middleware('auth');
+Route::resource('ideas', IdeaController::class)->only(['show']);
+Route::resource('ideas.comments', CommentController::class)->only(['store'])->middleware('auth');
+
+Route::get('/terms', function () {
     return view('terms');
 });
- 
+

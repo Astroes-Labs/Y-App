@@ -3,26 +3,30 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
                 <img style="width:50px" class="me-2 avatar-sm rounded-circle"
-                    src="https://api.dicebear.com/6.x/fun-emoji/svg?seed=Mario" alt="Mario Avatar">
+                    src="https://api.dicebear.com/6.x/fun-emoji/svg?seed={{ $idea->user->name }}"
+                    alt="{{ $idea->user->name }} Avatar">
                 <div>
-                    <h5 class="card-title mb-0"><a href="#"> Mario
+                    <h5 class="card-title mb-0"><a href="#"> {{ $idea->user->name }}
                         </a></h5>
                 </div>
             </div>
             <div>
-                <form action="{{ route('ideas.destroy', $idea->id) }}" method="POST">
-                    @method('delete')
-                    @csrf
+                @if (auth()->id() !== $idea->user_id)
 
-                    @if ($editing ?? false)
-                    @else
-                        <a class="mx-2" href="{{ route('ideas.edit', $idea->id) }}">Edit</a>
-                    @endif
-                    @isset($notviewing)
-                        <a href="{{ route('ideas.show', $idea->id) }}">View</a>
-                    @endisset
-                    <button class="ms-1 btn btn-danger btn-sm">X</button>
-                </form>
+                @else
+                    <form action="{{ route('ideas.destroy', $idea->id) }}" method="POST">
+                        @method('delete')
+                        @csrf
+                        @if ($editing ?? false)
+                        @else
+                            <a class="mx-2" href="{{ route('ideas.edit', $idea->id) }}">Edit</a>
+                        @endif
+                        @isset($notviewing)
+                            <a href="{{ route('ideas.show', $idea->id) }}">View</a>
+                        @endisset
+                        <button class="ms-1 btn text-danger btn-sm"><i class="fa fa-trash"></i></button>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
@@ -57,6 +61,6 @@
                     {{ $idea->created_at }} </span>
             </div>
         </div>
-      @include('shared.comments-box')
+        @include('shared.comments-box')
     </div>
 </div>
