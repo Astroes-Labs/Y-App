@@ -2,31 +2,30 @@
     <div class="px-3 pt-4 pb-2">
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
-                <img style="width:50px" class="me-2 avatar-sm rounded-circle"
-                    src="https://api.dicebear.com/6.x/fun-emoji/svg?seed={{ $idea->user->name }}"
+                <img style="width:50px" class="me-2 avatar-sm rounded-circle" src="{{ $idea->user->getImageURL() }}"
                     alt="{{ $idea->user->name }} Avatar">
                 <div>
-                    <h5 class="card-title mb-0"><a href="#"> {{ $idea->user->name }}
+                    <h5 class="card-title mb-0"><a href="{{ route('users.show', $idea->user->id) }}">
+                            {{ $idea->user->name }}
                         </a></h5>
                 </div>
             </div>
-            <div>
-                @if (auth()->id() !== $idea->user_id)
-
-                @else
-                    <form action="{{ route('ideas.destroy', $idea->id) }}" method="POST">
-                        @method('delete')
-                        @csrf
-                        @if ($editing ?? false)
-                        @else
-                            <a class="mx-2" href="{{ route('ideas.edit', $idea->id) }}">Edit</a>
-                        @endif
-                        @isset($notviewing)
-                            <a href="{{ route('ideas.show', $idea->id) }}">View</a>
-                        @endisset
-                        <button class="ms-1 btn text-danger btn-sm"><i class="fa fa-trash"></i></button>
-                    </form>
-                @endif
+            <div class="d-flex">
+                <a href="{{ route('ideas.show', $idea->id) }}"
+                    class="{{ Route::is('ideas.show') || Route::is('ideas.edit') ? 'd-none' : '' }}">View</a>
+                @auth
+                    {{-- @if (Auth::id() === $idea->user_id) --}}
+                    @can('update', $idea)
+                        <a class="mx-2" href="{{ route('ideas.edit', $idea->id) }}"
+                            class="{{ Route::is('ideas.edit') ? 'd-none' : '' }}">Edit</a>
+                        <form action="{{ route('ideas.destroy', $idea->id) }}" method="POST">
+                            @method('delete')
+                            @csrf
+                            <button class="ms-1 btn text-danger btn-sm"><i class="fa fa-trash"></i></button>
+                        </form>
+                    @endcan
+                    {{--  @endif --}}
+                @endauth
             </div>
         </div>
     </div>
@@ -52,15 +51,12 @@
             </p>
         @endif
         <div class="d-flex justify-content-between">
-            <div>
-                <a href="#" class="fw-light nav-link fs-6"> <span class="fas fa-heart me-1">
-                    </span> {{ $idea->likes }} </a>
-            </div>
+            @include('ideas.shared.like-button')
             <div>
                 <span class="fs-6 fw-light text-muted"> <span class="fas fa-clock"> </span>
-                    {{ $idea->created_at }} </span>
+                    {{ $idea->created_at->diffForHumans() }} </span>
             </div>
         </div>
-        @include('shared.comments-box')
+        @include('ideas.shared.comments-box')
     </div>
 </div>

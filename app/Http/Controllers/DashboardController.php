@@ -8,6 +8,9 @@ use App\Models\Idea;
 class DashboardController extends Controller
 {
     public function index(){
+
+        //preview of your email
+        //return new WelcomeEmail(auth()->user());
         $ideas = Idea::orderBy('created_at', 'DESC');
 
        if(request()->has('search')){
@@ -18,7 +21,6 @@ class DashboardController extends Controller
 
         return view('dashboard',[
             'ideas' => $ideas->paginate(5),
-            'notviewing' => true,
         ]);
     }
 }

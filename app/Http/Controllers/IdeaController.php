@@ -4,29 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Idea;
+use Illuminate\Support\Facades\Gate;
 
 class IdeaController extends Controller
 {
+    
     public function show(Idea $idea)
     {
 
         return view('ideas.show',[
             'idea' => $idea,
+            
+            'viewing' => true,
         ]);
     }
     public function edit(Idea $idea)
     {
-        if(auth()->id() !== $idea->user_id){
+        /* if(auth()->id() !== $idea->user_id){
             abort(404);
-        }
+        } */
+        
+        Gate::authorize('idea.edit', $idea);
         $editing = true;
         return view('ideas.show',compact('idea', 'editing'));
     }
     public function update(Idea $idea)
     {
-        if(auth()->id() !== $idea->user_id){
+        /* if(auth()->id() !== $idea->user_id){
             abort(404);
-        }
+        } */
        /*  request()->validate([
             'content' => 'required|min:3|max:240'
         ]);
@@ -34,6 +40,12 @@ class IdeaController extends Controller
         $idea->save(); */
 
         //OR
+        
+        //gates permissions
+        //Gate::authorize('idea.edit', $idea);
+
+        //policy permissions
+        Gate::authorize('update', $idea);
         $validated = request()->validate([
             'content' => 'required|min:3|max:240'
         ]);
@@ -66,9 +78,15 @@ class IdeaController extends Controller
     //Route Model Binding
     public function destroy(Idea $idea)
     {
-        if(auth()->id() !== $idea->user_id){
+       /*  if(auth()->id() !== $idea->user_id){
             abort(404);
-        }
+        } */
+
+        //gates permissions
+        //Gate::authorize('idea.delete', $idea);
+
+        //policy permissions
+        Gate::authorize('delete', $idea);
         $idea->delete();
         return redirect()->route('dashboard')->with('success', 'Idea Deleted Successfully!');
     }

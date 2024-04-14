@@ -8,7 +8,9 @@
         <div class="col-6">
 
             @include('shared.success-message')
-            @include('ideas.shared.submit-idea')
+            <div class="mt-3">
+                @include('users.shared.user-edit-card')
+            </div>
             <hr>
             @forelse ($ideas as $idea)
                 <div class="mt-3">
@@ -21,7 +23,6 @@
             <div class="mt-3">
                 {{ $ideas->withQueryString()->links() }}
             </div>
-
         </div>
         <div class="col-3">
             @include('shared.search-bar')

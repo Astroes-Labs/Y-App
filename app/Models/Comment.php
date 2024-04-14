@@ -13,8 +13,9 @@ class Comment extends Model
         'content',
     ];
 
-    
-    public function user(){
-        return $this->belongsToUser(User::class);
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
